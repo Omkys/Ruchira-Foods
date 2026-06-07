@@ -2,8 +2,11 @@ import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard,
   UtensilsCrossed,
-  Receipt,
+  Utensils,
+  ShoppingBag,
   History,
+  Users,
+  Calendar,
   BarChart3,
   LogOut,
   ChefHat,
@@ -13,9 +16,12 @@ import { NAV_ITEMS } from '../utils/constants'
 
 const iconMap = {
   LayoutDashboard,
-  UtensilsCrossed,
-  Receipt,
+  Utensils,
+  ShoppingBag,
   History,
+  Users,
+  Calendar,
+  UtensilsCrossed,
   BarChart3,
 }
 

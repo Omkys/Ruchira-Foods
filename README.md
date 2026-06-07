@@ -1,93 +1,73 @@
-# Restaurant Receipt Generator Admin Dashboard
+# Ruchira Foods — Restaurant & Mess Management
 
-A modern POS-style admin dashboard for restaurant billing and receipt generation, built with React, Vite, Tailwind CSS, and Supabase.
+Admin-only dashboard for dine-in billing, delivery orders, customer management, monthly mess plans, delivery tracking, and reports.
+
+**Tagline:** Where Every Meal Feels Like Home
 
 ## Features
 
-- **Admin Authentication** — Secure login via Supabase Auth with protected routes
-- **Dashboard** — Revenue stats, order counts, and recent receipts at a glance
-- **Menu Management** — Add, edit, and delete food items with categories and pricing
-- **Receipt Generator** — Select items, calculate total, generate unique receipt numbers
-- **Receipt Preview** — Thermal-style receipt layout with restaurant branding
-- **Print & PDF** — Browser print support and PDF download via jsPDF
-- **Receipt History** — Search by receipt number, customer name, or date filter
-- **Reports** — Daily, weekly, and monthly revenue analytics
+- **Admin Auth** — Supabase login, protected routes, logout
+- **Dashboard** — Dine In & Delivery workflow cards + live stats
+- **Dine In** — Table selection, menu cart, auto bill, receipt print/PDF
+- **Delivery** — Live customer search, new customer registration, delivery order creation
+- **Delivery Board** — Kanban-style status tracking (Pending → Delivered)
+- **Customers** — Search, edit, profile view, order history
+- **Monthly Plans** — Create, edit, renew, deactivate mess subscriptions
+- **Menu Management** — Full menu CRUD
+- **Reports** — Daily/weekly/monthly revenue, deliveries, top selling items
 
 ## Tech Stack
 
-- React 19 + Vite
-- Tailwind CSS 4
-- Supabase (Auth + PostgreSQL)
-- React Router 7
-- jsPDF
-- Lucide React Icons
+React 19 · Vite · Tailwind CSS 4 · Supabase · React Router · jsPDF · react-to-print
 
-## Getting Started
+## Setup
 
-### 1. Clone and Install
+### 1. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Set Up Supabase
+### 2. Supabase
 
-1. Create a new project at [supabase.com](https://supabase.com)
-2. Go to **SQL Editor** and run the contents of `supabase/schema.sql`
-3. Go to **Authentication > Users** and create an admin user with email/password
-4. Copy your project URL and anon key from **Settings > API**
+1. Create a project at [supabase.com](https://supabase.com)
+2. Run `supabase/schema.sql` in the SQL Editor
+3. Create an admin user under **Authentication → Users**
+4. Copy project URL and anon key
 
-### 3. Configure Environment
+### 3. Environment
 
-Create a `.env` file in the project root:
+Create `.env`:
 
 ```env
-VITE_SUPABASE_URL=your_supabase_project_url
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_URL=your_url
+VITE_SUPABASE_ANON_KEY=your_key
 ```
 
-### 4. Run Development Server
+### 4. Run
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173) and log in with your admin credentials.
-
-## Project Structure
-
-```
-src/
-├── components/     # Reusable UI components
-├── pages/          # Route pages
-├── layouts/        # App layouts (Dashboard, Auth)
-├── context/        # React context (Auth, Toast)
-├── services/       # Supabase data services
-├── utils/          # Helpers (formatters, PDF, receipt numbers)
-├── lib/            # Supabase client
-└── App.jsx         # Router and providers
-```
-
-## Receipt Number Format
-
-Receipts are auto-numbered as: `REC-YYYYMMDD-XXX`
-
-Example: `REC-20260606-001`
-
 ## Database Tables
 
-| Table | Description |
-|-------|-------------|
-| `menu_items` | Food items with name, category, price, availability |
-| `receipts` | Receipt headers with totals and customer info |
-| `receipt_items` | Line items for each receipt |
+| Table | Purpose |
+|-------|---------|
+| `customers` | Customer registry (regular / monthly) |
+| `monthly_plans` | Mess subscription plans |
+| `menu_items` | Food menu |
+| `orders` | All orders (dine_in, delivery) |
+| `order_items` | Line items per order |
+| `receipts` | Receipt numbers linked to orders |
 
-## Build for Production
+## Receipt Numbers
 
-```bash
-npm run build
-npm run preview
-```
+Format: `REC-2026-0001`, `REC-2026-0002`, ...
+
+## Migrating from v1
+
+If you used the old receipt-only schema, run `supabase/migration_v2_mess_management.sql` then `schema.sql`.
 
 ## License
 

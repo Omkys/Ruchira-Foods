@@ -6,9 +6,12 @@ import ToastContainer from './components/Toast'
 import DashboardLayout from './layouts/DashboardLayout'
 import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
+import DineIn from './pages/DineIn'
+import TakeawayDelivery from './pages/TakeawayDelivery'
+import History from './pages/History'
+import Customers from './pages/Customers'
+import MonthlyPlans from './pages/MonthlyPlans'
 import MenuManagement from './pages/MenuManagement'
-import ReceiptGenerator from './pages/ReceiptGenerator'
-import ReceiptHistory from './pages/ReceiptHistory'
 import Reports from './pages/Reports'
 
 export default function App() {
@@ -26,10 +29,17 @@ export default function App() {
               }
             >
               <Route index element={<Dashboard />} />
+              <Route path="dine-in" element={<DineIn />} />
+              <Route path="delivery-order" element={<TakeawayDelivery />} />
+              <Route path="takeaway" element={<Navigate to="/delivery-order" replace />} />
+              <Route path="history" element={<History />} />
+              <Route path="delivery" element={<Navigate to="/history" replace />} />
+              <Route path="customers" element={<Customers />} />
+              <Route path="plans" element={<MonthlyPlans />} />
               <Route path="menu" element={<MenuManagement />} />
-              <Route path="generate" element={<ReceiptGenerator />} />
-              <Route path="history" element={<ReceiptHistory />} />
               <Route path="reports" element={<Reports />} />
+              {/* Legacy route redirects */}
+              <Route path="generate" element={<Navigate to="/delivery-order" replace />} />
             </Route>
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

@@ -3,12 +3,15 @@ import { Link } from 'react-router-dom'
 import {
   IndianRupee,
   ShoppingBag,
-  Receipt,
-  TrendingUp,
+  Users,
+  Truck,
+  Calendar,
+  Utensils,
   ArrowRight,
 } from 'lucide-react'
 import StatCard from '../components/StatCard'
 import DataTable from '../components/DataTable'
+import OrderStatusBadge from '../components/OrderStatusBadge'
 import LoadingSpinner from '../components/LoadingSpinner'
 import { getDashboardStats } from '../services/reportService'
 import { formatCurrency, formatDateTime } from '../utils/formatters'
@@ -16,23 +19,13 @@ import { formatCurrency, formatDateTime } from '../utils/formatters'
 export default function Dashboard() {
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
 
   useEffect(() => {
-    loadStats()
+    getDashboardStats()
+      .then(setStats)
+      .catch(console.error)
+      .finally(() => setLoading(false))
   }, [])
-
-  const loadStats = async () => {
-    try {
-      setLoading(true)
-      const data = await getDashboardStats()
-      setStats(data)
-    } catch (err) {
-      setError(err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   if (loading) {
     return (
@@ -42,45 +35,31 @@ export default function Dashboard() {
     )
   }
 
-  if (error) {
-    return (
-      <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
-        <p className="font-medium">Failed to load dashboard</p>
-        <p className="text-sm">{error}</p>
-        <button
-          onClick={loadStats}
-          className="mt-2 text-sm font-medium underline"
-        >
-          Retry
-        </button>
-      </div>
-    )
-  }
-
   const recentColumns = [
     {
-      key: 'receipt_number',
-      label: 'Receipt #',
+      key: 'type',
+      label: 'Type',
       render: (row) => (
-        <span className="font-mono text-xs font-medium text-primary-600">
-          {row.receipt_number}
-        </span>
+        <span className="capitalize text-xs font-medium">{row.order_type?.replace('_', ' ')}</span>
       ),
     },
     {
-      key: 'customer_name',
+      key: 'customer',
       label: 'Customer',
-      render: (row) => row.customer_name || '—',
+      render: (row) => row.customers?.name || (row.table_number ? `Table ${row.table_number}` : '—'),
     },
     {
-      key: 'total_amount',
+      key: 'total',
       label: 'Amount',
-      render: (row) => (
-        <span className="font-semibold">{formatCurrency(row.total_amount)}</span>
-      ),
+      render: (row) => <span className="font-semibold">{formatCurrency(row.total_amount)}</span>,
     },
     {
-      key: 'created_at',
+      key: 'status',
+      label: 'Status',
+      render: (row) => <OrderStatusBadge status={row.status} />,
+    },
+    {
+      key: 'date',
       label: 'Date',
       render: (row) => formatDateTime(row.created_at),
     },
@@ -88,77 +67,58 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          title="Today's Revenue"
-          value={formatCurrency(stats.todayRevenue)}
-          icon={IndianRupee}
-          color="green"
-          trend={`${stats.todayOrders} orders today`}
-        />
-        <StatCard
-          title="Orders Today"
-          value={stats.todayOrders}
-          icon={ShoppingBag}
-          color="blue"
-        />
-        <StatCard
-          title="Total Receipts"
-          value={stats.totalReceipts}
-          icon={Receipt}
-          color="primary"
-        />
-        <StatCard
-          title="Monthly Revenue"
-          value={formatCurrency(stats.monthlyRevenue)}
-          icon={TrendingUp}
-          color="purple"
-          trend={`Weekly: ${formatCurrency(stats.weeklyRevenue)}`}
-        />
-      </div>
-
-      <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Receipts</h2>
-          <Link
-            to="/history"
-            className="flex items-center gap-1 text-sm font-medium text-primary-600 hover:text-primary-700"
-          >
-            View all <ArrowRight size={16} />
-          </Link>
-        </div>
-        <DataTable
-          columns={recentColumns}
-          data={stats.recentReceipts}
-          emptyMessage="No receipts generated yet"
-        />
-      </div>
-
+      {/* Workflow Cards */}
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
-          to="/generate"
-          className="flex items-center justify-between rounded-xl border border-primary-200 bg-primary-50 p-6 transition hover:bg-primary-100"
+          to="/dine-in"
+          className="group flex items-center justify-between rounded-2xl border-2 border-primary-200 bg-gradient-to-br from-primary-50 to-white p-8 transition hover:border-primary-400 hover:shadow-lg"
         >
           <div>
-            <h3 className="font-semibold text-primary-900">Generate New Receipt</h3>
-            <p className="mt-1 text-sm text-primary-700">
-              Create a bill and print receipt
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-600 text-white">
+              <Utensils size={24} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">Dine In</h2>
+            <p className="mt-2 text-sm text-gray-500">
+              Select table, add items, generate bill & receipt
             </p>
           </div>
-          <Receipt className="text-primary-600" size={32} />
+          <ArrowRight className="text-primary-400 transition group-hover:translate-x-1 group-hover:text-primary-600" size={28} />
         </Link>
+
         <Link
-          to="/menu"
-          className="flex items-center justify-between rounded-xl border border-gray-200 bg-white p-6 transition hover:bg-gray-50"
+          to="/delivery-order"
+          className="group flex items-center justify-between rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-white p-8 transition hover:border-blue-400 hover:shadow-lg"
         >
           <div>
-            <h3 className="font-semibold text-gray-900">Manage Menu</h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Add, edit, or remove food items
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-white">
+              <Truck size={24} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">Delivery</h2>
+            <p className="mt-2 text-sm text-gray-500">
+              Search customers, create delivery orders, generate receipts
             </p>
           </div>
-          <ShoppingBag className="text-gray-400" size={32} />
+          <ArrowRight className="text-blue-400 transition group-hover:translate-x-1 group-hover:text-blue-600" size={28} />
         </Link>
+      </div>
+
+      {/* Stats */}
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <StatCard title="Today's Revenue" value={formatCurrency(stats.todayRevenue)} icon={IndianRupee} color="green" />
+        <StatCard title="Orders Today" value={stats.todayOrders} icon={ShoppingBag} color="blue" />
+        <StatCard title="Monthly Customers" value={stats.monthlyCustomers} icon={Users} color="purple" />
+        <StatCard title="Pending Deliveries" value={stats.pendingDeliveries} icon={Truck} color="primary" />
+        <StatCard title="Active Monthly Plans" value={stats.activePlans} icon={Calendar} color="green" />
+      </div>
+
+      {/* Recent Orders */}
+      <div className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-lg font-semibold text-gray-900">Recent Orders</h2>
+        <DataTable
+          columns={recentColumns}
+          data={stats.recentOrders}
+          emptyMessage="No orders yet"
+        />
       </div>
     </div>
   )

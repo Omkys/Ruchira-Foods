@@ -25,6 +25,15 @@ export function formatDateTime(dateString) {
   }).format(new Date(dateString))
 }
 
+/** Today's date as YYYY-MM-DD for date input min attribute */
+export function getTodayDateInput() {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 export function getTodayRange() {
   const start = new Date()
   start.setHours(0, 0, 0, 0)
